@@ -28,31 +28,31 @@ class Node:
 
   def deleteRec(self, value):
     # node was not found
-    if self is None:
-      return self
-    if value < self.value:
-      # search for node in left subtree
-      self.left_child = self.left_child.deleteRec(value)
-    elif value > self.value:
+    if self is None: return self
+    if value > self.value and self.right_child is not None:
       # search for node in right subtree
       self.right_Child = self.right_child.deleteRec(value)
-    # found node
+    elif value < self.value and self.left_child is not None:
+      # search for node in left subtree
+      self.left_child = self.left_child.deleteRec(value)
+    # found node (self.value == value)
     else:
       # node has at most one child
       if self.left_child is None: 
         # set right child as node and delete node
-        temp = self.right_child
+        x = self.right_child
         self = None
-        return temp
+        return x
       elif self.right_child is None:
         # set the left child as node and delete node
-        temp = self.left_child
+        x = self.left_child
         self = None
-        return temp
+        return x
       # node has two children
-      inorder_successor = self.right_child.findMinRec()
-      self.value = inorder_successor.value
-      self.right.deleteRec(inorder_successor.value)  
+      elif self.right_child is not None:
+        inorder_successor = self.right_child.findMinRec()
+        self.value = inorder_successor.value
+        self.right_child = self.right_child.deleteRec(inorder_successor.value)  
     return self
   
   def findMinRec(self):
@@ -80,8 +80,7 @@ class Node:
   def findNextRec(self, value):
     node = self.findRec(value)
     if node is None:
-      print("Provided value does not exist.")
-      return -1
+      return None
     elif node.right_child is None:
       return self.findNextAncestorRec(value)
     return node.right_child.findNextChildRec()
@@ -102,8 +101,7 @@ class Node:
   def findPrevRec(self, value):
     node = self.findRec(value)
     if node is None:
-      print("Provided value does not exist.")
-      return -1
+      return None
     elif node.left_child is None:
       return self.findPrevAncestorRec(value)
     return node.left_child.findPrevChildRec()
@@ -121,33 +119,54 @@ class Node:
     if self.right_child is not None and value > self.value:
       return self.right_child.findPrevAncestorRec(value)
 
+def sortHelper(node, arr):
+  if node is None:
+    return None
+  sortHelper(node.left_child, arr)
+  arr.append(node.value)
+  sortHelper(node.right_child, arr)
 
-  
-def sort(root):  
+def sort(arr):
+  if len(arr) == 0: return None
+  root = Node(arr[0])
+  for element in arr[1:]:
+    root.insertRec(element)
+  sorted_arr = list()
+  sortHelper(root, sorted_arr)
+  return sorted_arr
+
+def printInorder(root):  
     if root is not None:
-        sort(root.left_child) 
+        printInorder(root.left_child) 
         print(root.value), 
-        sort(root.right_child)
-  
+        printInorder(root.right_child)
+
 def main():
-  #root = Node(21)
-  #root.insertRec(15)
-  #root.insertRec(25)
-  #root.insertRec(17)
-  #root.insertRec(19)
-  #root.insertRec(11)
-  #root.insertRec(13)
+  root = Node(25)
+  root.insertRec(20)
+  root.insertRec(36)
+  #root.insertRec(10)
   #root.insertRec(22)
-  #root.insertRec(20)
-  #print(root.findNextRec(21).value)
-  #print(root.findPrevRec(21).value)
+  #root.insertRec(30)
+  #root.insertRec(40)
+  #root.insertRec(5)
+  #root.insertRec(12)
+  #root.insertRec(28)
+  #root.insertRec(38)
+  #root.insertRec(48)
+  #root.insertRec(1)
+  #root.insertRec(8)
+  #root.insertRec(15)
+  #root.insertRec(45)
+  #root.insertRec(50)
+  root = root.deleteRec(25)
+  printInorder(root)
 
-  root = Node(2)
-  root.insertRec(0)
-  root.insertRec(4)
-  root.insertRec(3)
-  root.insertRec(5)
-  print(root.findNextRec(3).value)
-
+  #arr = [25, 20, 36, 10, 22, 30, 40, 5, 12, 28, 38, 48, 1, 8, 15, 45, 50]
+  #sorted_arr = sort(arr)
+  #for e in sorted_arr:
+  #  print(e)
+  pass
+ 
 if __name__ == "__main__":
-  main()
+  main()    
