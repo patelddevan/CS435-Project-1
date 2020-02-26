@@ -12,22 +12,72 @@ class Node:
         if currentNode.left_child is None:
           currentNode.left_child = node
           return
-        currentNode = self.left_child
+        currentNode = currentNode.left_child
       else:
         if currentNode.right_child is None:
           currentNode.right_child = node
           return
-        currentNode = self.right_child
-    
-  def removeIter(self, value):
-    currentNode = self
-    while currentNode.value != value:
-      if value <= currentNode.value:
-        currentNode = self.left_child
-      else:
-        currentNode = self.right_child
-    # remove currentNode
+        currentNode = currentNode.right_child
 
+  def deleteIter(self, value):
+      currentNode = self
+      parentNode = None
+      is_left_child = None
+      while True:
+        if currentNode.value == value:
+          break
+        if value < currentNode.value and currentNode.left_child is not None:
+          parentNode = currentNode
+          currentNode = currentNode.left_child
+          is_left_child = True
+        elif value > currentNode.value and currentNode.right_child is not None:
+          parentNode = currentNode
+          currentNode = currentNode.right_child
+          is_left_child = False
+        else:
+          return self
+      if currentNode is None:
+        return self
+      stack = list()
+      stack.append(currentNode)
+      while len(stack) > 0:
+        c = stack.pop()
+        if c.left_child is None and c.right_child is None:
+          if parentNode is None:
+              return None
+          elif is_left_child:
+            parentNode.left_child = None
+          else:
+            parentNode.right_child = None
+          return self
+        elif c.left_child is None:
+          if is_left_child is None:
+            return self.right_child
+          elif is_left_child:
+            parentNode.left_child = c.right_child
+          elif is_left_child == False:
+            parentNode.right_child = c.right_child
+          return self
+        elif c.right_child is None:
+          if is_left_child is None:
+            return self.left_child
+          elif is_left_child:
+            parentNode.left_child = c.left_child
+          elif is_left_child == False:
+            parentNode.right_child = c.left_child
+          return self
+        else:
+          parentNode = c
+          inorder_successor = c.right_child
+          is_left_child = False
+          while inorder_successor.left_child is not None:
+            parentNode = inorder_successor
+            inorder_successor = inorder_successor.left_child  
+            is_left_child = True
+          #print('replacing ' + str(c.value) + ' with ' + str(inorder_successor.value))        
+          c.value = inorder_successor.value
+          stack.append(inorder_successor)
+          
   def findMinIter(self):
     currentNode = self
     while currentNode.left_child is not None:
@@ -74,8 +124,7 @@ class Node:
   def findNextIter(self, value):
     node = self.findIter(value)
     if node is None:
-      print("Provided value does not exist.")
-      return -1
+      return None
     elif node.right_child is None:
       return self.findNextAncestorIter(value)
     return node.right_child.findNextChildIter()
@@ -102,8 +151,7 @@ class Node:
   def findPrevIter(self, value):
     node = self.findIter(value)
     if node is None:
-      print("Provided value does not exist.")
-      return -1
+      return None
     elif node.left_child is None:
       return self.findPrevAncestorIter(value)
     return node.left_child.findPrevChildIter()
@@ -116,11 +164,13 @@ def printInorder(root):
 
 def main():
   root = Node(2)
-  root.insertIter(0)
-  root.insertIter(4)
-  root.insertIter(3)
   root.insertIter(5)
-  print(root.findPrevIter(6).value)
+  root.insertIter(1)
+  root.insertIter(4)
+  root.insertIter(0)
+  root.insertIter(3)
+  root = root.deleteIter(2)
+  printInorder(root)
 
 if __name__ == "__main__":
   main()
