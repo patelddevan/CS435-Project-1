@@ -5,7 +5,7 @@ def getRandomArray(n):
   for i in range(n):
     random_int = getRandomNumber(n)
     while random_int in random_array:
-      random_int = getRandomArray(n)
+      random_int = getRandomNumber(n)
     random_array.append(random_int)
   return random_array 
 
